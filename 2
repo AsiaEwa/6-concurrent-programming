@@ -1,0 +1,98 @@
+#include <iostream>
+#include <iomanip>
+#include <time.h>
+#include <thread>
+#include <chrono>
+#include <mutex>
+std::mutex mtx;
+const int MLP = 50; // Maksymalna wartosc elementu tablicy
+const int LDT = 30; // Liczba wierszy
+const int LG = 6; // Liczba kolumn
+void srednia(int Tab[LDT][LG], float Srednie[LDT], int nr_wiersza)
+{
+std::lock_guard<std::mutex> lock(mtx);
+float suma = 0;
+for (int kolumna = 0; kolumna < LG; kolumna++) {
+suma += Tab[nr_wiersza][kolumna];
+}
+Srednie[nr_wiersza] = (float)suma / LG;
+}
+void roznice(int Tab[LDT][LG], float Srednie[LDT], float Roznice[LDT][LG], int
+nr_wiersza)
+{
+std::lock_guard<std::mutex> lock(mtx);
+for (int kolumna = 0; kolumna < LG; kolumna++) {
+int a = Tab[nr_wiersza][kolumna];
+Roznice[nr_wiersza][kolumna] = Tab[nr_wiersza][kolumna] -
+Srednie[nr_wiersza];
+}
+}
+void odchylenie(int Tab[LDT][LG], float Srednie[LDT], float Odchylenie[LDT], int
+nr_wiersza)
+{
+std::lock_guard<std::mutex> lock(mtx);
+float suma = 0;
+for (int kolumna = 0; kolumna < LG; kolumna++) {
+suma = suma + (Tab[nr_wiersza][kolumna] - Srednie[nr_wiersza])*
+(Tab[nr_wiersza][kolumna] - Srednie[nr_wiersza]) ;
+}
+Odchylenie[nr_wiersza] =sqrt ( (float)suma / LG );
+}
+int main()
+{
+int Tab[LDT][LG];
+float Roznice[LDT][LG];
+float Srednie[LDT];
+float Odchylenie[LDT];
+srand(time(NULL));
+for (int wiersz = 0; wiersz < LDT; wiersz++)
+for (int kolumna = 0; kolumna < LG; kolumna++)
+{
+Tab[wiersz][kolumna] = rand() % MLP;
+}
+for (int wiersz = 0; wiersz < LDT; wiersz++) {
+std::cout << " Tablica Tab, wiersz " << wiersz<< ": ";
+for (int kolumna = 0; kolumna < LG; kolumna++)
+std::cout << std::setw(4) << Tab[wiersz][kolumna];
+std::cout << std::endl;
+}
+std::thread watki_srednie[LDT];
+std::thread watki_roznice[LDT];
+std::thread watki_odchylenie[LDT];
+for (int i = 0; i < LDT; i++)
+{
+watki_srednie[i] = std::thread(srednia, Tab, Srednie, i);
+}
+for (int i = 0; i < LDT; i++)
+{
+watki_roznice[i] = std::thread(roznice, Tab, Srednie, Roznice, i);
+}
+for (int i = 0; i < LDT; i++)
+{
+watki_odchylenie[i] = std::thread(odchylenie, Tab, Srednie, Odchylenie,
+i);
+}
+for (int i = 0; i < LDT; i++)
+{
+watki_srednie[i].join();
+watki_roznice[i].join();
+watki_odchylenie[i].join();
+}
+for (int i = 0; i < LDT; i++)
+{
+std::cout << " Tablica Srednie, element " << i << ": " << Srednie[i] <<
+std::endl;
+}
+for (int wiersz = 0; wiersz < LDT; wiersz++) {
+std::cout << " Tablica Roznice, wiersz " << wiersz << ": ";
+for (int kolumna = 0; kolumna < LG; kolumna++)
+std::cout << std::setw(4) << Roznice[wiersz][kolumna]<< " ";
+std::cout << std::endl;
+}
+for (int i = 0; i < LDT; i++)
+{
+std::cout << " Tablica Odchylenie_standardowe, element " << i << ": " <<
+Odchylenie[i] << std::endl;
+}
+return 0;
+}
