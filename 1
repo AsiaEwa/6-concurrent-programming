@@ -22,3 +22,36 @@ suma += Tab[nr_wiersza][kolumna];
 }
 Srednie[nr_wiersza] = (float)suma/LG;
 std::cout << "Srednie[" <<nr_wiersza<<"] = "<<Srednie[nr_wiersza] <<std::endl;
+}
+int main()
+{
+int Tab[LDT][LG];
+int Tab2[LDT][LG];
+float Srednie[LDT];
+srand(time(NULL));
+for (int wiersz = 0; wiersz < LDT; wiersz++)
+for (int kolumna = 0; kolumna < LG; kolumna++)
+{
+Tab[wiersz][kolumna] = rand() % MLP ;
+Tab2[wiersz][kolumna] = 0;
+}
+std::cout << " Tablica Tab: " << std::endl;
+for (int wiersz = 0; wiersz < LDT; wiersz++) {
+for (int kolumna = 0; kolumna < LG; kolumna++)
+std::cout << std::setw(4) << Tab[wiersz][kolumna];
+std::cout << std::endl;
+}
+std::thread watki_tab2[LDT];
+std::thread watki_srednie[LDT];
+for (int i = 0; i < LDT; i++)
+{
+watki_tab2[i] = std::thread(do_kwadratu, Tab, Tab2, i);
+watki_srednie[i] = std::thread(srednia, Tab2, Srednie, i);
+}
+for (int i = 0; i < LDT; i++)
+{
+watki_srednie[i].join();
+watki_tab2[i].join();
+}
+return 0;
+}
