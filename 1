@@ -1,0 +1,24 @@
+#include <iostream>
+#include <iomanip>
+#include <time.h>
+#include <thread>
+#include <chrono>
+const int MLP = 10; // Maksymalna wartosc elementu tablicy
+const int LDT = 50; // Liczba wierszy
+const int LG = 40; // Liczba kolumn
+void do_kwadratu(int Tab[LDT][LG], int Tab2[LDT][LG], int nr_wiersza)
+{
+for (int kolumna = 0; kolumna < LG; kolumna++) {
+int a = Tab[nr_wiersza][kolumna];
+Tab2[nr_wiersza][kolumna] = a*a;
+std::cout << "Tab2[" <<nr_wiersza<<"]["<<kolumna<<"] = "<<Tab2[nr_wiersza][kolumna] <<std::endl;
+}
+}
+void srednia(int Tab[LDT][LG], float Srednie[LDT], int nr_wiersza)
+{
+float suma = 0;
+for (int kolumna = 0; kolumna < LG; kolumna++) {
+suma += Tab[nr_wiersza][kolumna];
+}
+Srednie[nr_wiersza] = (float)suma/LG;
+std::cout << "Srednie[" <<nr_wiersza<<"] = "<<Srednie[nr_wiersza] <<std::endl;
