@@ -8,9 +8,13 @@ const int LDT = 50; // Liczba wierszy
 const int LG = 40; // Liczba kolumn
 void do_kwadratu(int Tab[LDT][LG], int Tab2[LDT][LG], int nr_wiersza)
 {
+// 2 modyfy
+// std::lock_guard<std::mutex> lock(mtx);
 for (int kolumna = 0; kolumna < LG; kolumna++) {
 int a = Tab[nr_wiersza][kolumna];
 Tab2[nr_wiersza][kolumna] = a*a;
+// 1 modyfy
+// std::lock_guard<std::mutex> lock(mtx);
 std::cout << "Tab2[" <<nr_wiersza<<"]["<<kolumna<<"] = "<<Tab2[nr_wiersza][kolumna] <<std::endl;
 }
 }
